@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KSEN | LUXE CLOTHING</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #050505;
+      color: #fff;
+    }
+    .brand-font { font-family: 'Syncopate', sans-serif; }
+    
+    /* Neon Glow Effect - Redefined */
+    .glow-card {
+      transition: all 0.4s ease;
+    }
+    .glow-card:hover {
+      box-shadow: 0 0 30px rgba(109, 94, 252, 0.35);
+      border-color: #6d5efc !important; /* Indigo glow on hover */
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #050505; }
+    ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+
+    /* Product Card Hover Zoom - Keeping it smooth */
+    .product-img-container img {
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .product-card:hover .product-img-container img {
+      transform: scale(1.08);
+    }
+
+    /* Cart Drawer Animation */
+    #drawer { transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+  </style>
+</head>
+<body class="antialiased">
+
+  <nav class="fixed top-0 w-full z-[100] backdrop-blur-xl border-b border-white/5 bg-black/50">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="brand-font text-xl font-bold tracking-tighter uppercase italic">
+        KSEN<span class="text-indigo-500">.</span>Studio
+      </div>
+      
+      <div class="hidden md:flex gap-10 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+        <a href="#" class="hover:text-white transition">Collections</a>
+        <a href="#" class="hover:text-white transition">Archive</a>
+        <a href="#" class="hover:text-white transition">About</a>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <button class="relative p-2" onclick="toggleCart(true)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span id="cartCountBadge" class="absolute top-0 right-0 bg-indigo-600 text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+    
+    <div class="mb-20">
+      <h1 class="brand-font text-5xl md:text-8xl font-bold uppercase tracking-tighter leading-none mb-6">
+        FUTURE <br> <span class="text-transparent" style="-webkit-text-stroke: 1px #fff;">WEARABLE</span>
+      </h1>
+      <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+        <p class="text-gray-400 max-w-sm text-sm leading-relaxed">
+          The 2026 digital-first collection. Engineered for developers, thinkers, and those who build the future. 
+        </p>
+        <div class="flex gap-4">
+            <select class="bg-white/5 border border-white/10 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider outline-none text-gray-400">
+                <option>New Arrivals</option>
+                <option>Price: Low to High</option>
+            </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="mainGrid">
+      </div>
+  </main>
+
+  <div id="drawerOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[150] hidden opacity-0 transition-opacity duration-300" onclick="toggleCart(false)"></div>
+  <aside id="drawer" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-[#0a0a0a] z-[200] translate-x-full border-l border-white/10 flex flex-col shadow-2xl">
+    <div class="p-8 flex justify-between items-center border-b border-white/5">
+        <h2 class="brand-font text-sm uppercase tracking-widest">Bag</h2>
+        <button onclick="toggleCart(false)" class="text-2xl font-light hover:rotate-90 transition-transform duration-300">&times;</button>
+    </div>
+    
+    <div id="cartItemsList" class="flex-1 overflow-y-auto p-8 space-y-6">
+        </div>
+
+    <div class="p-8 bg-[#0d0d0d] border-t border-white/5">
+        <div class="flex justify-between mb-6">
+            <span class="text-gray-400 text-sm uppercase">Subtotal</span>
+            <span id="cartTotalValue" class="font-bold text-lg">₹0</span>
+        </div>
+        <button class="w-full bg-white text-black py-5 font-bold uppercase text-xs tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition-colors duration-300 rounded-sm">
+            Begin Checkout
+        </button>
+    </div>
+  </aside>
+
+  <script>
+    // Full Catalog with Images
+    const products = [
+      {id:1, name: "Matrix Hoodie", price: 2499, img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600"},
+      {id:2, name: "Binary Sneakers", price: 5999, img: "https://images.unsplash.com/photo-1520639889313-7272a74b1c28?q=80&w=600"}, // Red sneakers
+      {id:3, name: "Null Pointer Tee", price: 1299, img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=600"},
+      {id:4, name: "Cyberpunk Jacket", price: 4999, img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=600"}, // High tech leather jacket
+      {id:5, name: "Debug Cargo", price: 3499, img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600"},
+      {id:6, name: "Neon Runner Shoes", price: 6499, img: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=600"}, // Bright orange sneakers
+      {id:7, name: "Stack Overflow Watch", price: 11999, img: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=600"}, // Modern digital watch
+      {id:8, name: "Data Cap", price: 899, img: "https://images.unsplash.com/photo-1534215754734-18e55d13e346?q=80&w=600"} // Black baseball cap
+    ];
+
+    let cart = [];
+
+    function renderProducts() {
+      const grid = document.getElementById('mainGrid');
+      grid.innerHTML = products.map(p => `
+        <div class="product-card glow-card group relative bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden transition-all duration-300">
+          <div class="product-img-container h-80 overflow-hidden relative">
+            <img src="${p.img}" class="w-full h-full object-cover" loading="lazy"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex items-end">
+                <button onclick="addToCart(${p.id})" class="w-full bg-indigo-600 text-white py-3 rounded-full font-bold text-xs uppercase tracking-wider transform translate-y-4 group-hover:translate-y-0 transition-transform">Add to Bag</button>
+            </div>
+          </div>
+          <div class="p-6 flex justify-between items-start">
+            <div>
+              <h3 class="text-sm font-semibold text-gray-200">${p.name}</h3>
+              <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">KSEN Exclusive</p>
+            </div>
+            <p class="font-bold text-indigo-400 italic">₹${p.price.toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleCart(isOpen) {
+      const drawer = document.getElementById('drawer');
+      const overlay = document.getElementById('drawerOverlay');
+      if(isOpen) {
+        drawer.style.transform = "translateX(0)";
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.style.opacity = "1", 10);
+      } else {
+        drawer.style.transform = "translateX(100%)";
+        overlay.style.opacity = "0";
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      cart.push(product);
+      updateCartUI();
+      toggleCart(true);
+    }
+
+    function updateCartUI() {
+      const list = document.getElementById('cartItemsList');
+      const total = document.getElementById('cartTotalValue');
+      const badge = document.getElementById('cartCountBadge');
+      
+      badge.innerText = cart.length;
+      list.innerHTML = cart.map((item) => `
+        <div class="flex gap-4 items-center animate-pulse-once">
+            <img src="${item.img}" class="w-16 h-16 rounded object-cover border border-white/10" />
+            <div class="flex-1">
+                <h4 class="text-xs font-bold uppercase tracking-wider">${item.name}</h4>
+                <p class="text-xs text-gray-500">KSEN Signature</p>
+            </div>
+            <p class="text-sm font-bold">₹${item.price.toLocaleString('en-IN')}</p>
+        </div>
+      `).join('');
+
+      const sum = cart.reduce((acc, curr) => acc + curr.price, 0);
+      total.innerText = `₹${sum.toLocaleString('en-IN')}`;
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
